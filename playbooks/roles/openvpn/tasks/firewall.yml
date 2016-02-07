@@ -1,0 +1,31 @@
+---
+- name: Enable packet forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Allow traffic on 22 and 1194
+  ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+  with_items:
+    - { port: 22, proto: 'tcp' }
+    - { port: 1194, proto: 'udp' }
+
+- name: ufw forwarding policy to accept
+  lineinfile:
+    dest: /etc/default/ufw
+    regexp: DEFAULT_FORWARD_POLICY=
+    line: DEFAULT_FORWARD_POLICY="ACCEPT"
+
+- name: install openvpn config
+  template:
+    src: before.rules
+    dest: /etc/ufw/before.rules
+    owner: root
+    group: root
+    mode: 0600

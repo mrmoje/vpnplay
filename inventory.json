@@ -1,0 +1,51 @@
+{
+    "vpnserv_1": {
+        "common": {
+            "all": {
+                "vars": {
+                    "ansible_sudo": "yes",
+                    "ansible_ssh_user": "ubuntu",
+                    "domain": "vpnserv",
+                    "server_key_name": "vpnserv1",
+                    "easy_rsa_key_country": "KE",
+                    "easy_rsa_key_province": "Nairobi",
+                    "easy_rsa_key_city": "Nairobi",
+                    "easy_rsa_key_org": "tdt",
+                    "easy_rsa_key_email": "box@example.com",
+                    "easy_rsa_key_ou": "tdt",
+                    "easy_rsa_key_name": "vpnserv",
+                    "ovpn_listen_ifname": "eth0"
+                }
+            }
+        }
+    },
+    "common": {
+        "all": {
+            "vars": {
+                "ansible_sudo": "yes",
+                "ansible_ssh_user": "vagrant",
+                "ansible_ssh_private_key_file": "~/.vagrant.d/insecure_private_key",
+                "domain": "local",
+                "server_key_name": "local",
+                "easy_rsa_key_country": "KE",
+                "easy_rsa_key_province": "Nairobi",
+                "easy_rsa_key_city": "Nairobi",
+                "easy_rsa_key_org": "tdt",
+                "easy_rsa_key_email": "box@example.com",
+                "easy_rsa_key_ou": "tdt",
+                "easy_rsa_key_name": "vpnserv",
+                "ovpn_listen_ifname": "eth0"
+            }
+        },
+        "vpnserv": {
+            "hosts": [
+                "vpnserv"
+            ],
+            "vars":{
+                "ovpn_clients_keys": [
+                    "clientA"
+                ]
+            }
+        }
+    }
+}

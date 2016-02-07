@@ -1,0 +1,66 @@
+---
+- name: ensure openvpn service is stopped
+  service:
+    name: openvpn
+    state: stopped
+
+- name: install openvpn config
+  template:
+    src: server.conf
+    dest: /etc/openvpn/server.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: copy Easy-RSA generation scripts & make key storage dir.
+  shell: "{{ item }}"
+  with_items:
+    - cp -r /usr/share/easy-rsa/ /etc/openvpn
+    - mkdir /etc/openvpn/easy-rsa/keys
+  ignore_errors: true
+
+- name: copy easy rsa vars file
+  template:
+    src: easy_rsa_vars
+    dest: /etc/openvpn/easy-rsa/vars
+    owner: root
+    group: root
+    mode: 0644
+
+- name: generate DH parrams
+  shell: openssl dhparam -out /etc/openvpn/dh2048.pem 2048
+
+- name: check if certs exist
+  stat:
+    path: "/etc/openvpn/easy-rsa/keys/{{ server_key_name }}"
+  register: key
+
+- name: generate keys if they dont exist
+  shell: '{{ item }}'
+  args:
+    chdir: /etc/openvpn/easy-rsa
+  with_items:
+    - '. ./vars && ./clean-all'
+    - '. ./vars && "$EASY_RSA/pkitool" --initca'
+    - '. ./vars && "$EASY_RSA/pkitool" --server {{ server_key_name }}'
+  when: key.stat.exists != True
+
+- name: copy server keys up to /etc/openvpn
+  shell: "cp /etc/openvpn/easy-rsa/keys/{{ item }} /etc/openvpn/"
+  with_items:
+    - "{{ server_key_name }}.crt"
+    - "{{ server_key_name }}.key"
+    - "ca.crt"
+  when: key.stat.exists != True
+
+- name: ensure openvpn service is started
+  service:
+    name: openvpn
+    state: started
+    enabled: yes
+
+- name: generate client cert for each file
+  shell: '. ./vars && "$EASY_RSA/pkitool" {{ item }}'
+  args:
+    chdir: /etc/openvpn/easy-rsa
+  with_items: "{{ ovpn_clients_keys }}"
