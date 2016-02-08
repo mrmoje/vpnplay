@@ -1,0 +1,7 @@
+---
+- name: install openvpn on server node
+  hosts: vpnserv
+  sudo: True
+  gather_facts: True
+  roles:
+    - openvpn_server

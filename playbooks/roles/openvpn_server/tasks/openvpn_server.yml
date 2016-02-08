@@ -32,7 +32,7 @@
 
 - name: check if certs exist
   stat:
-    path: "/etc/openvpn/easy-rsa/keys/{{ server_key_name }}"
+    path: '/etc/openvpn/easy-rsa/keys/{{ server_key_name }}'
   register: key
 
 - name: generate keys if they dont exist
@@ -45,12 +45,12 @@
     - '. ./vars && "$EASY_RSA/pkitool" --server {{ server_key_name }}'
   when: key.stat.exists != True
 
-- name: copy server keys up to /etc/openvpn
-  shell: "cp /etc/openvpn/easy-rsa/keys/{{ item }} /etc/openvpn/"
+- name: copy server keys to /etc/openvpn
+  shell: 'cp /etc/openvpn/easy-rsa/keys/{{ item }} /etc/openvpn/'
   with_items:
-    - "{{ server_key_name }}.crt"
-    - "{{ server_key_name }}.key"
-    - "ca.crt"
+    - '{{ server_key_name }}.crt'
+    - '{{ server_key_name }}.key'
+    - 'ca.crt'
   when: key.stat.exists != True
 
 - name: ensure openvpn service is started
@@ -63,4 +63,19 @@
   shell: '. ./vars && "$EASY_RSA/pkitool" {{ item }}'
   args:
     chdir: /etc/openvpn/easy-rsa
-  with_items: "{{ ovpn_clients_keys }}"
+  with_items: '{{ ovpn_client_keys }}'
+
+- name: download generated client certs for each file
+  fetch:
+    src: '/etc/openvpn/easy-rsa/keys/{{ item[0] }}.{{ item[1] }}'
+    dest: '{{ inventory_dir }}/ovpn_client_keys/{{ inventory_hostname }}/{{ item[0] }}.{{ item[1] }}'
+    flat: yes
+  with_nested:
+    - '{{ ovpn_client_keys }}'
+    - ['key', 'crt']
+
+- name: download server ca.crt
+  fetch:
+    src: '/etc/openvpn/ca.crt'
+    dest: '{{ inventory_dir }}/ovpn_client_keys/{{ inventory_hostname }}/ca.crt'
+    flat: yes

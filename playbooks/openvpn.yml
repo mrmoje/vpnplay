@@ -1,7 +1,2 @@
 ---
-- name: install openvpn
-  hosts: vpnserv
-  sudo: True
-  gather_facts: True
-  roles:
-    - openvpn
+- include: openvpn_server.yml

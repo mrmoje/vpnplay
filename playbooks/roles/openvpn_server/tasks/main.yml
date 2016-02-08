@@ -1,4 +1,4 @@
 ---
 - include: packages.yml
-- include: openvpn.yml
+- include: openvpn_server.yml
 - include: firewall.yml
