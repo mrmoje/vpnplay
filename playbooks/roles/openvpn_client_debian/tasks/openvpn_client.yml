@@ -1,0 +1,11 @@
+---
+- name: install openvpn config
+  template:
+    src: client.ovpn
+    dest: "/etc/openvpn/{{ item[0] }}.ovpn"
+    owner: root
+    group: root
+    mode: 0644
+  with_nested:
+    - "{{ ovpn_servers }}"
+    - "{{ ovpn_client_keys }}"

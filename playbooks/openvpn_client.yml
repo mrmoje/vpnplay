@@ -1,0 +1,7 @@
+---
+- name: install openvpn on deb clients
+  hosts: vpnclient_debian
+  sudo: True
+  gather_facts: True
+  roles:
+    - openvpn_client_debian
