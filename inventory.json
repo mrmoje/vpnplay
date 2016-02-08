@@ -39,11 +39,24 @@
         },
         "vpnserv": {
             "hosts": [
-                "vpnserv"
+                "vpnserv-1"
             ],
-            "vars":{
-                "ovpn_clients_keys": [
-                    "clientA"
+            "vars": {
+                "ovpn_client_keys": [
+                    "clients-A"
+                ]
+            }
+        },
+        "vpnclient_debian": {
+            "hosts": [
+                "vpnclient-debian-1"
+            ],
+            "vars": {
+                "ovpn_servers": [
+                    "vpnserv-1.vpnserv"
+                ],
+                "ovpn_client_keys": [
+                    "clients-A"
                 ]
             }
         }
